@@ -8,7 +8,8 @@ foreach(v ${all_tests})
   add_executable(${target_name} ${v} ${all_srcs})
   target_link_libraries(${target_name} PUBLIC doctest nanobench mispdlog)
   if(ENABLE_BACKWARD AND NOT WIN32)
-    target_link_libraries(${target_name} PUBLIC 
-      Backward::Backward Backward::Object Backward::Interface) # trace
+    target_link_libraries(
+      ${target_name} PUBLIC Backward::Backward Backward::Object
+                            Backward::Interface) # trace
   endif()
 endforeach()
