@@ -1,3 +1,4 @@
+#pragma once
 #include <cstddef>
 #include <cstdint>
 #include <mispdlog/common.h>
@@ -30,9 +31,8 @@ inline constexpr char _k_level_ansi_colors[(std::uint8_t)level::off + 1][1] = {
 inline constexpr char _k_reset_ansi_color[1] = "";
 #endif
 
-#define COLORFUL_STRING(level, msg)                                            \
-  _LOG_IF_HAS_ANSI_COLORS(k_level_ansi_colors[(std::uint8_t)level] +)          \
-  msg _LOG_IF_HAS_ANSI_COLORS(+k_reset_ansi_color)
+MISPDLOG_API std::string color(level level, const std::string &msg);
+MISPDLOG_API std::string color(level level, const std::string_view &msg);
 
 // format time
 MISPDLOG_API std::string
@@ -48,5 +48,10 @@ MISPDLOG_API size_t get_thread_id();
 MISPDLOG_API std::string &left_trim(std::string &s);
 MISPDLOG_API std::string &right_trim(std::string &s);
 MISPDLOG_API std::string &trim(std::string &s);
+
+// string utils
+inline std::string to_string(std::string_view sv) {
+  return std::string(sv); // 一次拷贝，RVO 优化
+}
 } // namespace details
 } // namespace mispdlog
