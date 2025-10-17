@@ -1,7 +1,9 @@
 #pragma once
 
 #include "mispdlog/common.h"
+
 #include <cstdint>
+
 namespace mispdlog {
 // 有宏展开的写法，见threadpool中的minilog
 enum class level : std::uint8_t {

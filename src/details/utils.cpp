@@ -1,11 +1,13 @@
+#include "mispdlog/details/utils.h"
 #include "mispdlog/common.h"
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <ctime>
 #include <iomanip>
-#include <mispdlog/details/utils.h>
 #include <sstream>
+
 namespace mispdlog {
 namespace details {
 
@@ -16,7 +18,7 @@ std::string color(level level, const std::string &msg) {
   return color_s;
 }
 
-std::string color(level level, const std::string_view &msg) {
+std::string color(level level, std::string_view msg) {
   return color(level, to_string(msg));
 }
 

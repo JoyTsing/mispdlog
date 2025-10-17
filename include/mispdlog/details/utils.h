@@ -1,8 +1,10 @@
 #pragma once
+
+#include "mispdlog/common.h"
+#include "mispdlog/level.h"
+
 #include <cstddef>
 #include <cstdint>
-#include <mispdlog/common.h>
-#include <mispdlog/level.h>
 #include <string>
 #include <string_view>
 
@@ -32,7 +34,7 @@ inline constexpr char _k_reset_ansi_color[1] = "";
 #endif
 
 MISPDLOG_API std::string color(level level, const std::string &msg);
-MISPDLOG_API std::string color(level level, const std::string_view &msg);
+MISPDLOG_API std::string color(level level, std::string_view msg);
 
 // format time
 MISPDLOG_API std::string
