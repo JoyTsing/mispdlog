@@ -36,7 +36,7 @@ if(WIN32)
 elseif(UNIX)
   message(STATUS "This is UNIX")
 else()
-  message(STATUS "This is UNKNOW OS")
+  message(STATUS "This is UNKNOWN OS")
 endif()
 
 # 坏的写法，最好是用更现代化的target_include_directories
