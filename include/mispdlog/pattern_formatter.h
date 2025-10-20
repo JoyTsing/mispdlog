@@ -34,9 +34,9 @@ public:
 
 public:
   /**
-   * @brief Base class for flag formatters, each flag formatter is responsible
-   * for formatting a specific part of the log message, e.g., timestamp, level,
-   * message, etc.
+   * @brief P-IMPL, Base class for flag formatters, each flag formatter is
+   * responsible for formatting a specific part of the log message, e.g.,
+   * timestamp, level, message, etc.
    *
    */
   class flag_formatter {
