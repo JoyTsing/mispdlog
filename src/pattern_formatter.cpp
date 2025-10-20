@@ -17,7 +17,8 @@ class raw_string_formatter : public pattern_formatter::flag_formatter {
 public:
   explicit raw_string_formatter(std::string str) : str_(str) {}
 
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format([[maybe_unused]] const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     buf.append(str_.data(), str_.data() + str_.size());
   }
@@ -36,8 +37,8 @@ private:
  */
 class year_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:04d}", tm.tm_year + 1900);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -51,8 +52,8 @@ public:
  */
 class month_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_mon + 1);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -67,8 +68,8 @@ public:
  */
 class day_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_mday);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -83,8 +84,8 @@ public:
  */
 class hour_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_hour);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -99,8 +100,8 @@ public:
  */
 class minute_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_min);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -115,8 +116,8 @@ public:
  */
 class second_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
-              fmt::memory_buffer &buf) override {
+  void format([[maybe_unused]] const details::log_message &msg,
+              const std::tm &tm, fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_sec);
   }
   std::unique_ptr<flag_formatter> clone() const override {
@@ -131,7 +132,8 @@ public:
  */
 class level_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format(const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     std::string_view level_str = level_to_short_string(msg.level);
     buf.append(level_str.data(), level_str.data() + level_str.size());
@@ -148,7 +150,8 @@ public:
  */
 class level_full_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format(const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     std::string_view level_str = level_to_string(msg.level);
     buf.append(level_str.data(), level_str.data() + level_str.size());
@@ -165,7 +168,8 @@ public:
  */
 class name_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format(const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     buf.append(msg.logger_name.data(),
                msg.logger_name.data() + msg.logger_name.size());
@@ -182,7 +186,8 @@ public:
  */
 class payload_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format(const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     buf.append(msg.payload.data(), msg.payload.data() + msg.payload.size());
   }
@@ -198,7 +203,8 @@ public:
  */
 class thread_id_formatter : public pattern_formatter::flag_formatter {
 public:
-  void format(const details::log_message &msg, const std::tm &tm,
+  void format(const details::log_message &msg,
+              [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
     fmt::format_to(std::back_inserter(buf), "{}", msg.thread_id);
   }

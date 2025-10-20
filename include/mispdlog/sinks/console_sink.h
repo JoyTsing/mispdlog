@@ -1,11 +1,9 @@
 #pragma once
 
-#include "mispdlog/details/utils.h"
-#include "mispdlog/level.h"
 #include "mispdlog/sinks/base_sink.h"
+#include <fmt/format.h>
 #include <iostream>
 #include <ostream>
-#include <string_view>
 
 namespace mispdlog {
 namespace sinks {
@@ -13,10 +11,9 @@ namespace sinks {
 template <typename Mutex> class console_sink : public base_sink<Mutex> {
 protected:
   void sink_it_(const details::log_message &msg) override {
-    std::string time_str = details::format_time(msg.time);
-    std::string_view level_str = level_to_string(msg.level);
-    std::cout << "[" << time_str << "]" << "[" << level_str << "]"
-              << msg.payload << "\n";
+    fmt::memory_buffer formatted;
+    this->format_(msg, formatted);
+    std::cout.write(formatted.data(), formatted.size()); // out
   }
 
   void flush_() override { std::cout << std::flush; }
@@ -28,10 +25,9 @@ using console_sink_st = console_sink<null_mutex>;
 template <typename Mutex> class stderr_sink : public base_sink<Mutex> {
 protected:
   void sink_it_(const details::log_message &msg) override {
-    std::string time_str = details::format_time(msg.time);
-    std::string_view level_str = level_to_string(msg.level);
-    std::cerr << "[" << time_str << "]" << "[" << level_str << "]"
-              << msg.payload << "\n";
+    fmt::memory_buffer formatted;
+    this->format_(msg, formatted);
+    std::cerr.write(formatted.data(), formatted.size()); // out
   }
 
   void flush_() override { std::cerr << std::flush; }
