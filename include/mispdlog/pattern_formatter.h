@@ -20,6 +20,13 @@ public:
 
   ~pattern_formatter() override = default;
 
+  /**
+   * @brief Format the log message according to the pattern;
+   * Pattern: [%Y-%m-%d %H:%M:%S] [%l] %v ;
+   * Output:  [2025-09-30 03:36:39] [I] Hello, World!
+   * @param msg
+   * @param buf
+   */
   void format(const details::log_message &msg,
               fmt::memory_buffer &buf) override;
 
@@ -64,7 +71,7 @@ public:
 private:
   void compile_pattern();
 
-  std::tm get_time(const details::log_message &msg);
+  std::tm get_time(const details::log_message &msg) const;
 
 private:
   std::string pattern_;
