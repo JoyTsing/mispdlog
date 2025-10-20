@@ -1,5 +1,6 @@
 #include "mispdlog/level.h"
 #include "mispdlog/sinks/console_sink.h"
+#include <memory>
 #include <thread>
 #define ANKERL_NANOBENCH_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
@@ -26,7 +27,7 @@ TEST_CASE("test_pattern_compilation") {
     formatter.format(msg, buf);
 
     std::cout << "Pattern: " << pattern << "\n";
-    std::cout << "Output:  " << std::string_view(buf.data(), buf.size());
+    std::cout << "Output:  " << std::string(buf.data(), buf.size());
     std::cout << "\n";
   });
 }
@@ -42,7 +43,7 @@ TEST_CASE("test_all_flags") {
       details::log_message msg("MyLogger", level::warn, "Test message");
       fmt::memory_buffer buf; formatter.format(msg, buf);
 
-      std::cout << std::string_view(buf.data(), buf.size()););
+      std::cout << std::string(buf.data(), buf.size()););
 }
 
 // NOLINTNEXTLINE
@@ -120,7 +121,7 @@ TEST_CASE("test_custom_patterns") {
         formatter.format(msg, buf);
 
         std::cout << "描述: " << test.description << "\n";
-        std::cout << "输出: " << std::string_view(buf.data(), buf.size());
+        std::cout << "输出: " << std::string(buf.data(), buf.size());
       });
 }
 
@@ -133,7 +134,7 @@ TEST_CASE("test_escape_percent") {
       fmt::memory_buffer buf; formatter.format(msg, buf);
 
       std::cout << "Pattern: Progress: 50%% - %v\n";
-      std::cout << "Output:  " << std::string_view(buf.data(), buf.size()););
+      std::cout << "Output:  " << std::string(buf.data(), buf.size()););
 }
 
 // NOLINTNEXTLINE
@@ -183,22 +184,21 @@ TEST_CASE("test_pattern_change") {
 // NOLINTNEXTLINE
 TEST_CASE("test_thread_id") {
   std::cout << "\n========== 测试9:多线程 ID 显示 ==========\n";
-  CHECK_NOTHROW(pattern_formatter formatter("[thread %t] %v");
-                auto log_from_thread =
-                    [&formatter](int thread_num) {
-                      details::log_message msg("ThreadTest", level::info,
-                                               "Message from thread " +
-                                                   std::to_string(thread_num));
-                      fmt::memory_buffer buf;
-                      formatter.format(msg, buf);
-                      std::cout << std::string_view(buf.data(), buf.size());
-                    };
+  CHECK_NOTHROW(
+      auto sink = std::make_shared<sinks::console_sink_mt>();
+      sink->set_formatter(
+          std::make_unique<pattern_formatter>("[thread %t] %v"));
+      auto log_from_thread =
+          [&](int thread_num) {
+            std::string s = "Message From thread" + std::to_string(thread_num);
+            details::log_message msg("ThreadTest", level::info, s);
+            sink->log(msg);
+          };
 
-                std::thread t1(log_from_thread, 1);
-                std::thread t2(log_from_thread, 2);
-                std::thread t3(log_from_thread, 3);
+      std::thread t1(log_from_thread, 1); std::thread t2(log_from_thread, 2);
+      std::thread t3(log_from_thread, 3);
 
-                t1.join(); t2.join(); t3.join(););
+      t1.join(); t2.join(); t3.join(););
 }
 
 // NOLINTNEXTLINE
@@ -210,6 +210,6 @@ TEST_CASE("test_unknown_flags") {
       fmt::memory_buffer buf; formatter.format(msg, buf);
 
       std::cout << "Pattern: [%Y-%m-%d] [%Z] %v\n";
-      std::cout << "Output:  " << std::string_view(buf.data(), buf.size());
+      std::cout << "Output:  " << std::string(buf.data(), buf.size());
       std::cout << "说明: 未知占位符 %Z 被原样输出\n";);
 }

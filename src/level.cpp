@@ -4,16 +4,15 @@
 #include <cstddef>
 #include <mispdlog/level.h>
 #include <string>
-#include <string_view>
 
 namespace mispdlog {
-static constexpr std::array<std::string_view, 7> level_names = {
+static constexpr std::array<const char *, 7> level_names = {
     "trace", "debug", "info", "warn", "error", "critical", "off"};
 
-static constexpr std::array<std::string_view, 7> level_short_names = {
+static constexpr std::array<const char *, 7> level_short_names = {
     "T", "D", "I", "W", "E", "C", "O"};
 
-std::string_view level_to_string(level lv) noexcept {
+const char *level_to_string(level lv) noexcept {
   auto index = static_cast<std::uint8_t>(lv);
   if (index < level_names.size()) {
     return level_names[index];
@@ -21,7 +20,7 @@ std::string_view level_to_string(level lv) noexcept {
   return "unknown";
 }
 
-std::string_view level_to_short_string(level lv) noexcept {
+const char *level_to_short_string(level lv) noexcept {
   auto index = static_cast<std::uint8_t>(lv);
   if (index < level_names.size()) {
     return level_short_names[index];

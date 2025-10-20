@@ -35,13 +35,11 @@ TEST_CASE("test source location simple") {
       details::log_message msg("TestLogger", level::debug, loc,
                                "Debug message with source info");
 
-      std::cout << "文件名: "
-                << (msg.loc.filename.empty() ? "null" : msg.loc.filename)
+      std::cout << "文件名: " << (msg.loc.filename ? msg.loc.filename : "null")
                 << "\n";
       std::cout << "行号: " << msg.loc.line << "\n";
       std::cout << "函数名: "
-                << (msg.loc.function_name.empty() ? "null"
-                                                  : msg.loc.function_name)
+                << (msg.loc.function_name ? msg.loc.function_name : "null")
                 << "\n";);
 }
 // NOLINTNEXTLINE
@@ -53,8 +51,7 @@ TEST_CASE("test multi-thread console sink") {
                 std::vector<level> levels = {level::trace, level::debug,
                                              level::info, level::warn,
                                              level::error, level::critical};
-                for (auto lvl
-                     : levels) {
+                for (auto lvl : levels) {
                   std::string msg_content =
                       std::string("This is a ") +
                       details::to_string(level_to_string(lvl)) + " message";
@@ -79,8 +76,7 @@ TEST_CASE("test logoutput filtering") {
                                         level::warn, level::error,
                                         level::critical};
 
-      for (auto lvl
-           : test_levels) {
+      for (auto lvl : test_levels) {
         std::string msg_content =
             std::string("Testing ") + details::to_string(level_to_string(lvl));
         details::log_message msg("FilterTest", lvl, msg_content);

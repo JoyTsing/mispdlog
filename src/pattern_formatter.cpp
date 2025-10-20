@@ -135,8 +135,8 @@ public:
   void format(const details::log_message &msg,
               [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
-    std::string_view level_str = level_to_short_string(msg.level);
-    buf.append(level_str.data(), level_str.data() + level_str.size());
+    const char *level_str = level_to_short_string(msg.level);
+    buf.append(level_str, level_str + std::strlen(level_str));
   }
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<level_formatter>();
@@ -153,8 +153,8 @@ public:
   void format(const details::log_message &msg,
               [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
-    std::string_view level_str = level_to_string(msg.level);
-    buf.append(level_str.data(), level_str.data() + level_str.size());
+    const char *level_str = level_to_string(msg.level);
+    buf.append(level_str, level_str + std::strlen(level_str));
   }
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<level_full_formatter>();
@@ -305,7 +305,8 @@ void pattern_formatter::compile_pattern() {
           break;
         default:
           // unknown flag, treat as raw string
-          raw_str.push_back('%' + flag);
+          raw_str.push_back('%');
+          raw_str.push_back(flag);
           break;
         }
       }

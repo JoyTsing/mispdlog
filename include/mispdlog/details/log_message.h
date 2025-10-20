@@ -5,7 +5,6 @@
 
 #include <cstddef>
 #include <mispdlog/details/utils.h>
-#include <string_view>
 
 namespace mispdlog {
 namespace details {
@@ -16,15 +15,15 @@ namespace details {
 struct source_location {
   // 无动态资源，设计为constexpr编译期可构造
   constexpr source_location() = default;
-  constexpr source_location(std::string_view filename, int line,
-                            std::string_view function_name)
+  constexpr source_location(const char *filename, int line,
+                            const char *function_name)
       : filename(filename), line(line), function_name(function_name) {}
 
   constexpr bool empty() const noexcept { return line == 0; }
 
-  std::string_view filename{};
+  const char *filename{nullptr};
   int line{0};
-  std::string_view function_name{};
+  const char *function_name{nullptr};
 };
 
 /**
@@ -43,9 +42,9 @@ struct log_message {
    * @param loc
    * @param message
    */
-  log_message(std::string_view name, mispdlog::level level,
+  log_message(string_view_t name, mispdlog::level level,
               log_clock::time_point time, source_location loc,
-              std::string_view message)
+              string_view_t message)
       : logger_name(name), payload(message), level(level), time(time), loc(loc),
         thread_id(get_thread_id()) {}
 
@@ -57,8 +56,8 @@ struct log_message {
    * @param loc
    * @param message
    */
-  log_message(std::string_view name, mispdlog::level level, source_location loc,
-              std::string_view message)
+  log_message(string_view_t name, mispdlog::level level, source_location loc,
+              string_view_t message)
       : log_message(name, level, log_clock::now(), loc, message) {}
 
   /**
@@ -68,15 +67,14 @@ struct log_message {
    * @param level
    * @param message
    */
-  log_message(std::string_view name, mispdlog::level level,
-              std::string_view message)
+  log_message(string_view_t name, mispdlog::level level, string_view_t message)
       : log_message(name, level, source_location(), message) {}
 
   log_message(const log_message &) = default;
   log_message &operator=(const log_message &rhs) = default;
 
-  std::string_view logger_name;
-  std::string_view payload; // 日志内容
+  string_view_t logger_name;
+  string_view_t payload; // 日志内容
   mispdlog::level level{mispdlog::level::info};
   log_clock::time_point time; // timestamp
   source_location loc;

@@ -1,15 +1,14 @@
 #pragma once
 
 #include <chrono>
-#include <string_view>
+#include <string>
 
 namespace mispdlog {
 
-// version
-static volatile constexpr std::string_view version = "0.0.0.1";
 // 别名
-using string_view_t = std::string_view;
+using string_view_t = std::string; // for c++11
 using log_clock = std::chrono::high_resolution_clock;
+
 // os
 #ifdef _WIN32
 #define MISPDLOG_WIN

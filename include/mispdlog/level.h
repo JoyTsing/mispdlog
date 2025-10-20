@@ -16,8 +16,8 @@ enum class level : std::uint8_t {
   off = 6       // 关闭日志
 };
 
-MISPDLOG_API std::string_view level_to_string(level lv) noexcept;
-MISPDLOG_API std::string_view level_to_short_string(level lv) noexcept;
+MISPDLOG_API const char *level_to_string(level lv) noexcept;
+MISPDLOG_API const char *level_to_short_string(level lv) noexcept;
 MISPDLOG_API level string_to_level(const std::string &str);
 
 // 级别比较函数

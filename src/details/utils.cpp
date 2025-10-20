@@ -11,19 +11,14 @@
 namespace mispdlog {
 namespace details {
 
-std::string color(level level, const std::string &msg) {
+std::string color(level level, const string_view_t &msg) {
   std::string color_s =
       _LOG_IF_HAS_ANSI_COLORS(_k_level_ansi_colors[(std::uint8_t)level] +)
           msg _LOG_IF_HAS_ANSI_COLORS(+_k_reset_ansi_color);
   return color_s;
 }
 
-std::string color(level level, std::string_view msg) {
-  return color(level, to_string(msg));
-}
-
-std::string format_time(const log_clock::time_point &tp,
-                        std::string_view format) {
+std::string format_time(const log_clock::time_point &tp, string_view_t format) {
   std::time_t time_t_val = log_clock::to_time_t(tp);
   std::tm tm_val;
   // 线程安全的时间转换

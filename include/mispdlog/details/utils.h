@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -33,13 +32,12 @@ inline constexpr char _k_level_ansi_colors[(std::uint8_t)level::off + 1][1] = {
 inline constexpr char _k_reset_ansi_color[1] = "";
 #endif
 
-MISPDLOG_API std::string color(level level, const std::string &msg);
-MISPDLOG_API std::string color(level level, std::string_view msg);
+MISPDLOG_API std::string color(level level, const string_view_t &msg);
 
 // format time
 MISPDLOG_API std::string
 format_time(const log_clock::time_point &tp,
-            std::string_view format = "%Y-%m-%d %H:%M:%S");
+            string_view_t format = "%Y-%m-%d %H:%M:%S");
 
 // 获取当前时间戳(毫秒)
 MISPDLOG_API uint64_t get_timestamp_ms();
@@ -52,7 +50,7 @@ MISPDLOG_API std::string &right_trim(std::string &s);
 MISPDLOG_API std::string &trim(std::string &s);
 
 // string utils
-inline std::string to_string(std::string_view sv) {
+inline std::string to_string(string_view_t sv) {
   return std::string(sv); // 一次拷贝，RVO 优化
 }
 } // namespace details
