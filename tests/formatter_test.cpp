@@ -1,3 +1,4 @@
+#include "mispdlog/level.h"
 #include "mispdlog/sinks/console_sink.h"
 #include <thread>
 #define ANKERL_NANOBENCH_IMPLEMENT
@@ -48,7 +49,7 @@ TEST_CASE("test_all_flags") {
 TEST_CASE("test_level_formatting()") {
   std::cout << "\n========== 测试3:不同级别格式化 ==========\n";
   auto sink = std::make_shared<sinks::console_sink_mt>();
-
+  sink->set_level(level::trace);
   CHECK_NOTHROW( // 设置自定义 pattern
       sink->set_formatter(
           std::make_unique<pattern_formatter>("[%Y-%m-%d %H:%M:%S] [%L] %v"));
