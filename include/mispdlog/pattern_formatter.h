@@ -16,7 +16,7 @@ public:
    * @param pattern
    */
   explicit pattern_formatter(
-      const std::string &pattern = "[%Y-%m-%d %H:%M:%S] [%L] %v");
+      const std::string &pattern = "[%Y-%m-%d %H:%M:%S][%L]%v");
 
   ~pattern_formatter() override = default;
 
