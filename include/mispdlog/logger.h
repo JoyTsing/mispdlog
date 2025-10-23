@@ -30,6 +30,11 @@ public:
   std::vector<sinks::sink_ptr> &sinks();
   const std::vector<sinks::sink_ptr> &sinks() const;
 
+  /**
+   * @brief Set all logs level, high priority
+   *
+   * @param level above all the sinks level
+   */
   void set_level(level level);
   level get_level() const;
   bool should_log(level message_level) const;
