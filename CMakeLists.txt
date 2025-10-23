@@ -13,8 +13,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-
 message(STATUS "This is PROJECT_SOURCE_DIR " ${PROJECT_SOURCE_DIR})
 message(STATUS "This is PROJECT_BINARY_DIR " ${PROJECT_BINARY_DIR})
 
@@ -46,5 +44,5 @@ endif()
 # include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
-add_subdirectory(tests)
+add_subdirectory(test)
 add_subdirectory(third-party)

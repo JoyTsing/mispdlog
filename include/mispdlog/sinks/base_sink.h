@@ -53,8 +53,8 @@ public:
 template <typename Mutex> class base_sink : public sink {
 public:
   base_sink()
-      : level_(level::info), formatter_(std::make_unique<pattern_formatter>()) {
-  }
+      : level_(level::trace),
+        formatter_(std::make_unique<pattern_formatter>()) {}
   virtual ~base_sink() = default;
 
   /**
