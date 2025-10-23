@@ -1,5 +1,2 @@
 add_subdirectory(doctest)
 add_subdirectory(nanobench)
-if(ENABLE_BACKWARD AND NOT WIN32)
-  add_subdirectory(backward-cpp)
-endif()

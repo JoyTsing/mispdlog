@@ -10,11 +10,3 @@ target_include_directories(
                   $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(mispdlog PUBLIC fmt::fmt)
-
-if(ENABLE_BACKWARD AND NOT WIN32)
-  target_link_libraries(mispdlog PUBLIC Backward::Backward Backward::Object
-                                        Backward::Interface) # trace
-endif()
-
-# 设置编译特性
-target_compile_features(mispdlog PUBLIC cxx_std_17)

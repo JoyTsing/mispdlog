@@ -32,6 +32,8 @@ public:
     colors_[static_cast<int>(level::error)] = color::red;
     colors_[static_cast<int>(level::critical)] =
         std::string(color::bold) + color::red;
+    colors_[static_cast<int>(level::off)] =
+        std::string(color::bold) + color::magenta;
   }
 
   ~color_console_sink() = default;
