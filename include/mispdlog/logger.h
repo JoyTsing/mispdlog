@@ -157,7 +157,7 @@ protected:
 protected:
   std::string name_;
   std::vector<sinks::sink_ptr> sinks_;
-  level level_{level::info};
+  level level_{level::trace};
   level flush_level_{level::off}; // 自动刷新日志等级
 };
 } // namespace mispdlog
