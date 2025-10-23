@@ -11,6 +11,9 @@
 namespace mispdlog {
 namespace sinks {
 
+class sink;
+using sink_ptr = std::shared_ptr<sink>;
+
 struct null_mutex {
   void lock() {}
   void unlock() {}
@@ -62,9 +65,7 @@ public:
 
   void log(const details::log_message &msg) override {
     std::lock_guard<Mutex> lock(mutex_);
-    if (should_log(msg.level)) {
-      sink_it_(msg);
-    }
+    sink_it_(msg);
   }
 
   void flush() override {
