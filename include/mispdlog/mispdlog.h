@@ -10,6 +10,48 @@
 #include <string>
 #include <utility>
 
+/**
+┌─────────────────────────────────────────────────────────────────┐
+│                    用户代码层                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  方式1: 全局接口              方式2: 工厂函数                   │
+│  minispdlog::info("msg")      auto log = stdout_color_mt("app") │
+│  minispdlog::error("err")     log->info("msg")                  │
+│         ↓                              ↓                         │
+│  default_logger()              register_logger(log)             │
+└───────────┬───────────────────────────┬──────────────────────────┘
+            │                           │
+            └───────────┬───────────────┘
+                        ↓
+         ┌──────────────────────────────────────┐
+         │    minispdlog::registry (单例)       │
+         ├──────────────────────────────────────┤
+         │  mutex_ (线程安全锁)                 │
+         ├──────────────────────────────────────┤
+         │  loggers_:                            │
+         │    unordered_map<string, logger_ptr> │
+         │    ┌──────────────────────────┐      │
+         │    │ "app"    -> app_logger   │      │
+         │    │ "db"     -> db_logger    │      │
+         │    │ "network"-> net_logger   │      │
+         │    └──────────────────────────┘      │
+         ├──────────────────────────────────────┤
+         │  default_logger_: shared_ptr<logger> │
+         │    ↓                                  │
+         │  [彩色控制台 logger]                 │
+         └──────────────────────────────────────┘
+                        ↓
+         ┌──────────────────────────────────────┐
+         │           Logger 对象                 │
+         │  ┌────────────────────────┐           │
+         │  │ name: "app"            │           │
+         │  │ sinks: [console_sink]  │           │
+         │  │ level: info            │           │
+         │  └────────────────────────┘           │
+         └──────────────────────────────────────┘
+ */
+
 namespace mispdlog {
 inline std::shared_ptr<logger> get_logger(const std::string &name) {
   return registry::instance().get(name);
