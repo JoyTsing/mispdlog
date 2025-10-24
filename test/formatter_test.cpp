@@ -1,15 +1,15 @@
-#include "mispdlog/level.h"
-#include "mispdlog/sinks/console_sink.h"
-#include <memory>
-#include <thread>
 #define ANKERL_NANOBENCH_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include "mispdlog/level.h"
 #include "mispdlog/pattern_formatter.h"
+#include "mispdlog/sinks/console_sink.h"
 
 #include <doctest.h>
 #include <fmt/format.h>
+#include <memory>
 #include <nanobench.h>
+#include <thread>
 
 using namespace mispdlog;
 // NOLINTNEXTLINE
@@ -19,7 +19,8 @@ TEST_CASE("test_pattern_compilation") {
   std::string patterns[] = {"[%Y-%m-%d %H:%M:%S] [%l] %v", "%H:%M:%S.%L - %v",
                             "[%L] [%n] [thread %t] %v",
                             "%Y年%m月%d日 %H时%M分%S秒 %v"};
-  CHECK_NOTHROW(for (const auto &pattern : patterns) {
+  CHECK_NOTHROW(for (const auto &pattern
+                     : patterns) {
     pattern_formatter formatter(pattern);
     fmt::memory_buffer buf;
 
@@ -58,7 +59,8 @@ TEST_CASE("test_level_formatting()") {
       level levels[] = {level::trace, level::debug, level::info, level::warn,
                         level::error, level::critical};
 
-      for (auto lvl : levels) {
+      for (auto lvl
+           : levels) {
         std::string msg_text = std::string("This is ") +
                                fmt::to_string(level_to_string(lvl)) +
                                " message";
@@ -113,7 +115,8 @@ TEST_CASE("test_custom_patterns") {
                              {"[%Y-%m-%d %H:%M:%S] [%n] [%L] [tid:%t] %v",
                               "完整格式"}};
 
-      for (const auto &test : tests) {
+      for (const auto &test
+           : tests) {
         pattern_formatter formatter(test.pattern);
         details::log_message msg("CustomLogger", level::info,
                                  "Sample log message");

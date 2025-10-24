@@ -1,15 +1,15 @@
-#include "mispdlog/level.h"
-#include "mispdlog/mispdlog.h"
-#include "mispdlog/sinks/console_sink.h"
-#include <thread>
 #define ANKERL_NANOBENCH_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include "mispdlog/level.h"
 #include "mispdlog/logger.h"
+#include "mispdlog/mispdlog.h"
+#include "mispdlog/sinks/console_sink.h"
 
 #include <doctest.h>
 #include <fmt/format.h>
 #include <nanobench.h>
+#include <thread>
 
 using namespace mispdlog;
 // NOLINTNEXTLINE

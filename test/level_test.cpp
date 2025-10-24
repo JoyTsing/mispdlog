@@ -3,6 +3,7 @@
 
 #include "mispdlog/details/utils.h"
 #include "mispdlog/level.h"
+
 #include <doctest.h>
 #include <nanobench.h>
 
@@ -13,7 +14,8 @@ TEST_CASE("test level conversion") { // 测试所有级别
   CHECK_NOTHROW(
       level levels[] = {level::trace, level::debug, level::info, level::warn,
                         level::error, level::critical, level::off};
-      for (auto lvl : levels) {
+      for (auto lvl
+           : levels) {
         std::cout << "Level: " << std::setw(10) << level_to_string(lvl)
                   << " | Short: " << level_to_short_string(lvl)
                   << " | Value: " << static_cast<int>(lvl) << "\n";
@@ -26,7 +28,8 @@ TEST_CASE("test string to level") {
                 std::string test_strings[] = {"trace", "DEBUG", "Info", "WARN",
                                               "unknown"};
 
-                for (const auto &str : test_strings) {
+                for (const auto &str
+                     : test_strings) {
                   auto lvl = string_to_level(str);
                   std::cout << "Input: " << std::setw(10) << str << " -> "
                             << level_to_string(lvl) << "\n";
@@ -41,7 +44,8 @@ TEST_CASE("test should log") {
                 bool check[] = {false, false, true, true, true}; int index = 0;
                 std::cout << "Logger level set to: "
                           << level_to_string(logger_level) << "\n";
-                for (auto msg_level : test_levels) {
+                for (auto msg_level
+                     : test_levels) {
                   bool should = should_log(logger_level, msg_level);
                   CHECK_EQ(check[index++], should);
                   std::cout << "Message level: " << std::setw(10)
@@ -80,7 +84,8 @@ TEST_CASE("test colorful") {
                 << "test color" << '\n';
       level levels[] = {level::trace, level::debug, level::info, level::warn,
                         level::error, level::critical, level::off};
-      for (auto level : levels) {
+      for (auto level
+           : levels) {
         std::cout << details::color(level, level_to_string(level)) << "\n";
       } std::cout
       << "test color back normal" << '\n';);

@@ -1,14 +1,14 @@
-#include "mispdlog/level.h"
 #define ANKERL_NANOBENCH_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include "mispdlog/level.h"
+#include "mispdlog/logger.h"
 #include "mispdlog/sinks/color_console_sink.h"
 #include "mispdlog/sinks/console_sink.h"
 #include "mispdlog/sinks/file_sink.h"
 
 #include <doctest.h>
 #include <memory>
-#include <mispdlog/logger.h>
 #include <nanobench.h>
 #include <thread>
 

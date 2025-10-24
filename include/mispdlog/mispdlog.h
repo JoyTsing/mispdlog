@@ -6,6 +6,7 @@
 #include "mispdlog/sinks/color_console_sink.h"
 #include "mispdlog/sinks/console_sink.h"
 #include "mispdlog/sinks/file_sink.h"
+#include "mispdlog/sinks/rotating_file_sink.h"
 #include <memory>
 #include <string>
 #include <utility>
@@ -135,6 +136,25 @@ inline std::shared_ptr<logger> basic_logger_mt(const std::string &logger_name,
                                                const std::string &path,
                                                bool truncate = false) {
   auto sink = std::make_shared<sinks::file_sink_mt>(path, truncate);
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+/**
+ * @brief make sinks::rotating_file_sink_mt
+ *
+ * @param logger_name
+ * @param filename
+ * @param max_size
+ * @param max_files
+ * @return std::shared_ptr<logger>
+ */
+inline std::shared_ptr<logger>
+rotating_logger_mt(const std::string &logger_name, const std::string &path,
+                   size_t max_size, size_t max_files) {
+  auto sink =
+      std::make_shared<sinks::rotating_file_sink_mt>(path, max_size, max_files);
   auto new_logger = std::make_shared<logger>(logger_name, sink);
   register_logger(new_logger);
   return new_logger;
