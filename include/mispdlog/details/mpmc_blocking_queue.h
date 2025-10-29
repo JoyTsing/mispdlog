@@ -17,7 +17,6 @@ public:
   mpmc_blocking_queue &operator=(const mpmc_blocking_queue &) = delete;
 
   void enqueue(T &&item) {
-
     std::unique_lock<std::mutex> lock(mutex_);
     pop_cv_.wait(lock, [this] { return !this->q_.full(); });
     q_.push_back(std::move(item));
@@ -26,7 +25,6 @@ public:
   }
 
   void enqueue_nowait(T &&item) {
-
     std::unique_lock<std::mutex> lock(mutex_);
     q_.push_back(std::move(item));
 

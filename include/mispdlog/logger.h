@@ -2,6 +2,7 @@
 
 #include "mispdlog/common.h"
 #include "mispdlog/details/log_message.h"
+#include "mispdlog/details/threadpool.h"
 #include "mispdlog/level.h"
 #include "mispdlog/sinks/base_sink.h"
 #include <fmt/core.h>
@@ -12,7 +13,14 @@
 #include <vector>
 
 namespace mispdlog {
+
+namespace details {
+class threadpool;
+} // namespace details
+
 class MISPDLOG_API logger {
+  friend class details::threadpool;
+
 public:
   explicit logger(std::string nmae);
   logger(std::string name, sinks::sink_ptr single_sink);
