@@ -8,24 +8,68 @@ namespace mispdlog {
 // Implementation details would go here
 // such as flag_formatter derived classes
 namespace {
+// 快速整数到字符串转换
+inline void fast_uint_to_str(uint64_t n, char *buffer) {
+  // 使用查表法优化小数字
+  static constexpr char digits_table[] =
+      "0001020304050607080910111213141516171819"
+      "2021222324252627282930313233343536373839"
+      "4041424344454647484950515253545556575859"
+      "6061626364656667686970717273747576777879"
+      "8081828384858687888990919293949596979899";
+
+  if (n < 100) {
+    if (n < 10) {
+      buffer[0] = '0' + n;
+      buffer[1] = '\0';
+    } else {
+      const char *d = digits_table + n * 2;
+      buffer[0] = d[0];
+      buffer[1] = d[1];
+      buffer[2] = '\0';
+    }
+    return;
+  }
+  // 对于大数字，回退到标准方法
+  fmt::format_to(buffer, "{}", n);
+}
+
+// 快速两位数转换(用于时间格式化)
+inline void fast_two_digits(uint32_t n, char *buffer) {
+  if (n < 100) {
+    const char *d = &"0001020304050607080910111213141516171819"
+                     "2021222324252627282930313233343536373839"
+                     "4041424344454647484950515253545556575859"
+                     "6061626364656667686970717273747576777879"
+                     "8081828384858687888990919293949596979899"[n * 2];
+    buffer[0] = d[0];
+    buffer[1] = d[1];
+  } else {
+    buffer[0] = '0';
+    buffer[1] = '0';
+  }
+}
 
 /**
- * @brief A flag formatter that outputs a raw string
+ * @brief aggregate text formatter
  *
  */
-class raw_string_formatter : public pattern_formatter::flag_formatter {
+class aggregate_formatter : public pattern_formatter::flag_formatter {
 public:
-  explicit raw_string_formatter(std::string str) : str_(str) {}
+  explicit aggregate_formatter(std::string str) : str_(std::move(str)) {}
 
-  void format([[maybe_unused]] const details::log_message &msg,
-              [[maybe_unused]] const std::tm &tm,
-              fmt::memory_buffer &buf) override {
-    buf.append(str_.data(), str_.data() + str_.size());
+  void format(const details::log_message &, const std::tm &,
+              fmt::memory_buffer &dest) override {
+    // 直接内存拷贝，避免逐字符追加
+    dest.append(str_.data(), str_.data() + str_.size());
   }
 
   std::unique_ptr<flag_formatter> clone() const override {
-    return std::make_unique<raw_string_formatter>(str_);
+    return std::make_unique<aggregate_formatter>(str_);
   }
+
+  void add_ch(char ch) { str_ += ch; }
+  void add_str(const std::string &str) { str_ += str; }
 
 private:
   std::string str_;
@@ -39,8 +83,17 @@ class year_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:04d}", tm.tm_year + 1900);
+    char buffer[5];
+    int year = tm.tm_year + 1900;
+    // 手动展开避免 sprintf 开销
+    buffer[0] = '0' + (year / 1000);
+    buffer[1] = '0' + ((year / 100) % 10);
+    buffer[2] = '0' + ((year / 10) % 10);
+    buffer[3] = '0' + (year % 10);
+    buffer[4] = '\0';
+    buf.append(buffer, buffer + 4);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<year_formatter>();
   }
@@ -54,8 +107,11 @@ class month_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_mon + 1);
+    char buffer[3];
+    fast_two_digits(tm.tm_mon + 1, buffer);
+    buf.append(buffer, buffer + 2);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<month_formatter>();
   }
@@ -70,8 +126,11 @@ class day_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_mday);
+    char buffer[3];
+    fast_two_digits(tm.tm_mday, buffer);
+    buf.append(buffer, buffer + 2);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<day_formatter>();
   }
@@ -86,8 +145,11 @@ class hour_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_hour);
+    char buffer[3];
+    fast_two_digits(tm.tm_hour, buffer);
+    buf.append(buffer, buffer + 2);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<hour_formatter>();
   }
@@ -102,8 +164,11 @@ class minute_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_min);
+    char buffer[3];
+    fast_two_digits(tm.tm_min, buffer);
+    buf.append(buffer, buffer + 2);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<minute_formatter>();
   }
@@ -118,8 +183,11 @@ class second_formatter : public pattern_formatter::flag_formatter {
 public:
   void format([[maybe_unused]] const details::log_message &msg,
               const std::tm &tm, fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{:02d}", tm.tm_sec);
+    char buffer[3];
+    fast_two_digits(tm.tm_sec, buffer);
+    buf.append(buffer, buffer + 2);
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<second_formatter>();
   }
@@ -135,9 +203,14 @@ public:
   void format(const details::log_message &msg,
               [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
-    const char *level_str = level_to_short_string(msg.level);
-    buf.append(level_str, level_str + std::strlen(level_str));
+    static constexpr std::string_view level_strings[] = {"T", "D", "I",
+                                                         "W", "E", "C"};
+    if (static_cast<size_t>(msg.level) < std::size(level_strings)) {
+      auto level_str = level_strings[static_cast<size_t>(msg.level)];
+      buf.append(level_str.data(), level_str.data() + level_str.size());
+    }
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<level_formatter>();
   }
@@ -153,9 +226,15 @@ public:
   void format(const details::log_message &msg,
               [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
-    const char *level_str = level_to_string(msg.level);
-    buf.append(level_str, level_str + std::strlen(level_str));
+    static constexpr std::string_view level_strings[] = {
+        "trace", "debug", "info", "warning", "error", "critical"};
+
+    if (static_cast<size_t>(msg.level) < std::size(level_strings)) {
+      auto level_str = level_strings[static_cast<size_t>(msg.level)];
+      buf.append(level_str.data(), level_str.data() + level_str.size());
+    }
   }
+
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<level_full_formatter>();
   }
@@ -206,7 +285,10 @@ public:
   void format(const details::log_message &msg,
               [[maybe_unused]] const std::tm &tm,
               fmt::memory_buffer &buf) override {
-    fmt::format_to(std::back_inserter(buf), "{}", msg.thread_id);
+    char buffer[64];
+    fast_uint_to_str(static_cast<uint64_t>(msg.thread_id), buffer);
+    size_t len = std::strlen(buffer);
+    buf.append(buffer, buffer + len);
   }
   std::unique_ptr<flag_formatter> clone() const override {
     return std::make_unique<thread_id_formatter>();
@@ -221,6 +303,9 @@ pattern_formatter::pattern_formatter(const std::string &pattern)
 
 void pattern_formatter::format(const details::log_message &msg,
                                fmt::memory_buffer &buf) {
+  // 预分配空间避免多次重新分配
+  buf.reserve(buf.size() + 256);
+
   // update tm when seconds change
   auto secs = std::chrono::duration_cast<std::chrono::seconds>(
       msg.time.time_since_epoch());
@@ -229,7 +314,7 @@ void pattern_formatter::format(const details::log_message &msg,
     cached_tm_ = get_time(msg);
   }
 
-  for (auto &formatter : formatters_) {
+  for (const auto &formatter : formatters_) {
     formatter->format(msg, cached_tm_, buf);
   }
   buf.push_back('\n');
@@ -249,16 +334,17 @@ void pattern_formatter::compile_pattern() {
   auto it = pattern_.begin();
   auto end = pattern_.end();
   // parse the pattern
-  std::string raw_str;
+  std::unique_ptr<aggregate_formatter> raw_str;
   while (it != end) {
     if (*it != '%') {
-      raw_str.push_back(*it);
+      if (!raw_str) {
+        raw_str = std::make_unique<aggregate_formatter>("");
+      }
+      raw_str->add_ch(*it);
       ++it;
     } else {
-      if (!raw_str.empty()) {
-        formatters_.emplace_back(
-            std::make_unique<raw_string_formatter>(std::move(raw_str)));
-        raw_str.clear();
+      if (raw_str) {
+        formatters_.emplace_back(std::move(raw_str));
       }
       ++it; // skip '%'
       if (it != end) {
@@ -301,20 +387,25 @@ void pattern_formatter::compile_pattern() {
           break;
         case '%':
           // escaped '%'
-          raw_str.push_back('%');
+          if (!raw_str) {
+            raw_str = std::make_unique<aggregate_formatter>("");
+          }
+          raw_str->add_ch('%');
           break;
         default:
           // unknown flag, treat as raw string
-          raw_str.push_back('%');
-          raw_str.push_back(flag);
+          if (!raw_str) {
+            raw_str = std::make_unique<aggregate_formatter>("");
+          }
+          raw_str->add_ch('%');
+          raw_str->add_ch(flag);
           break;
         }
       }
     }
   } // while
-  if (!raw_str.empty()) {
-    formatters_.emplace_back(
-        std::make_unique<raw_string_formatter>(std::move(raw_str)));
+  if (raw_str) {
+    formatters_.emplace_back((std::move(raw_str)));
   }
 }
 
