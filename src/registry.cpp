@@ -97,9 +97,9 @@ void registry::init_threadpool(size_t queue_size, size_t threads_n) {
 
 std::shared_ptr<details::threadpool> registry::threadpool() {
   std::lock_guard<std::mutex> lock(mutex_);
-
   // 延迟初始化:首次调用时创建默认线程池
   if (!threadpool_) {
+    std::cout << ">>> create threadpool" << std::endl;
     create_default_threadpool_();
   }
 

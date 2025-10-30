@@ -50,7 +50,7 @@ public:
    * @param queue_size
    * @param threads_n
    */
-  void init_threadpool(size_t queue_size, size_t threads_n = 1);
+  void init_threadpool(size_t queue_size = 8192, size_t threads_n = 1);
 
   /**
    * @brief

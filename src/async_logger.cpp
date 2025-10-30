@@ -21,17 +21,19 @@ void async_logger::sink_it_(const details::log_message &msg) {
     } else if (overflow_policy_ == async_overflow_policy::overrun_oldest) {
       pool_ptr->post_log_nowait(shared_from_this(), msg);
     }
+  } else {
+    throw std::runtime_error(
+        "async_logger::sink_it_: threadpool doesn't exist anymore");
   }
-  throw std::runtime_error(
-      "async_logger::sink_it_: threadpool doesn't exist anymore");
 }
 
 void async_logger::flush_() {
   if (auto pool_ptr = threadpool_.lock()) {
     pool_ptr->post_flush(shared_from_this());
+  } else {
+    throw std::runtime_error(
+        "async_logger::flush_: threadpool doesn't exist anymore");
   }
-  throw std::runtime_error(
-      "async_logger::flush_: threadpool doesn't exist anymore");
 }
 
 void async_logger::backend_sink_it_(const details::log_message &msg) {
