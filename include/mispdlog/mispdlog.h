@@ -160,6 +160,59 @@ rotating_logger_mt(const std::string &logger_name, const std::string &path,
   return new_logger;
 }
 
+// 创建彩色控制台 logger(单线程)
+inline std::shared_ptr<logger> stdout_color_st(const std::string &logger_name) {
+  auto sink = std::make_shared<sinks::color_console_sink_st>();
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+// 创建彩色 stderr logger(单线程)
+inline std::shared_ptr<logger> stderr_color_st(const std::string &logger_name) {
+  auto sink = std::make_shared<sinks::color_stderr_sink_st>();
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+// 创建普通控制台 logger(单线程)
+inline std::shared_ptr<logger> stdout_st(const std::string &logger_name) {
+  auto sink = std::make_shared<sinks::console_sink_st>();
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+// 创建普通 stderr logger(单线程)
+inline std::shared_ptr<logger> stderr_st(const std::string &logger_name) {
+  auto sink = std::make_shared<sinks::stderr_sink_st>();
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+// 创建文件 logger(单线程)
+inline std::shared_ptr<logger> basic_logger_st(const std::string &logger_name,
+                                               const std::string &filename,
+                                               bool truncate = false) {
+  auto sink = std::make_shared<sinks::file_sink_st>(filename, truncate);
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
+// 创建滚动文件 logger(单线程)
+inline std::shared_ptr<logger>
+rotating_logger_st(const std::string &logger_name, const std::string &filename,
+                   size_t max_size, size_t max_files) {
+  auto sink = std::make_shared<sinks::rotating_file_sink_st>(filename, max_size,
+                                                             max_files);
+  auto new_logger = std::make_shared<logger>(logger_name, sink);
+  register_logger(new_logger);
+  return new_logger;
+}
+
 // fast use
 template <typename... Args>
 inline void trace(fmt::format_string<Args...> fmt, Args &&...args) {
@@ -191,8 +244,4 @@ inline void critical(fmt::format_string<Args...> fmt, Args &&...args) {
   default_logger()->critical(fmt, std::forward<Args>(args)...);
 }
 
-template <typename... Args>
-inline void off(fmt::format_string<Args...> fmt, Args &&...args) {
-  default_logger()->off(fmt, std::forward<Args>(args)...);
-}
 } // namespace mispdlog

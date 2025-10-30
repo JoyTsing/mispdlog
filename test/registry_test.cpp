@@ -71,7 +71,7 @@ TEST_CASE("test_default_logger") {
       trace("Traece from default logger"); debug("Debug from default logger");
       info("This is from default logger"); warn("Warning from default logger");
       error("Error from default logger");
-      critical("Critical from default logger"); off("Off from default logger");
+      critical("Critical from default logger");
 
       // 替换默认 logger
       auto new_default = stdout_color_mt("new_default");

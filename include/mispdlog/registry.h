@@ -1,5 +1,6 @@
 #pragma once
 #include "mispdlog/common.h"
+#include "mispdlog/details/threadpool.h"
 #include "mispdlog/level.h"
 #include "mispdlog/logger.h"
 #include <cstddef>
