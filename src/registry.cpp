@@ -87,4 +87,38 @@ void registry::throw_if_exists_(const std::string &logger_name) {
                              "' already exists.");
   }
 }
+
+void registry::init_threadpool(size_t queue_size, size_t threads_n) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  // 创建新的线程池(会销毁旧的)
+  threadpool_ = std::make_shared<details::threadpool>(queue_size, threads_n);
+}
+
+std::shared_ptr<details::threadpool> registry::threadpool() {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  // 延迟初始化:首次调用时创建默认线程池
+  if (!threadpool_) {
+    create_default_threadpool_();
+  }
+
+  return threadpool_;
+}
+
+void registry::set_threadpool(std::shared_ptr<details::threadpool> tp) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  threadpool_ = std::move(tp);
+}
+
+void registry::create_default_threadpool_() {
+  // 默认配置:队列大小 8192,1 个工作线程
+  // 参考 spdlog 的默认配置
+  constexpr size_t default_queue_size = 8192;
+  constexpr size_t default_threads = 1;
+
+  threadpool_ = std::make_shared<details::threadpool>(default_queue_size,
+                                                      default_threads);
+}
+
 } // namespace mispdlog
