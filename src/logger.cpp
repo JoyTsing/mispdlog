@@ -31,11 +31,7 @@ bool logger::should_log(level message_level) const {
   return message_level >= level_;
 }
 
-void logger::flush() {
-  for (const auto &sink : sinks_) {
-    sink->flush();
-  }
-}
+void logger::flush() { flush_(); }
 
 void logger::flush_when(level level) { flush_level_ = level; }
 
@@ -49,6 +45,14 @@ void logger::sink_it_(const details::log_message &message) {
   }
   if (message.level >= flush_level_) {
     flush();
+  }
+}
+
+void logger::flush_() {
+  for (auto &sink : sinks_) {
+    {
+      sink->flush();
+    }
   }
 }
 

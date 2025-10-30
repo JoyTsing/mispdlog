@@ -5,9 +5,10 @@
 #include <memory>
 
 namespace mispdlog {
-class logger;
+class async_logger;
 namespace details {
 enum class async_message_type { log, flush, terminate };
+using async_logger_ptr = std::shared_ptr<async_logger>;
 
 struct log_message_buffer : log_message {
   std::string buffer;
@@ -38,7 +39,7 @@ struct log_message_buffer : log_message {
 struct async_message : log_message_buffer {
   async_message_type type{async_message_type::log};
 
-  std::shared_ptr<logger> log_ptr;
+  async_logger_ptr log_ptr;
 
   async_message() = default;
   ~async_message() = default;
@@ -55,11 +56,11 @@ struct async_message : log_message_buffer {
    * @param ptr
    * @param message
    */
-  async_message(async_message_type type, std::shared_ptr<logger> &&ptr,
+  async_message(async_message_type type, async_logger_ptr &&ptr,
                 const log_message &message)
       : log_message_buffer(message), type(type), log_ptr(std::move(ptr)) {}
 
-  async_message(async_message_type type, std::shared_ptr<logger> &&ptr)
+  async_message(async_message_type type, async_logger_ptr &&ptr)
       : log_message_buffer{}, type(type), log_ptr(std::move(ptr)) {}
 
   async_message(const async_message &) = delete;

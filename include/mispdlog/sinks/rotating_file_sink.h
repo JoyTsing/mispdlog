@@ -21,7 +21,8 @@ namespace sinks {
  * - 当达到 max_files 限制时,删除最旧的文件
  * @tparam Mutex
  */
-template <typename Mutex> class rotating_file_sink : public base_sink<Mutex> {
+template <typename Mutex>
+class rotating_file_sink final : public base_sink<Mutex> {
 public:
   rotating_file_sink(const std::string &filename, size_t max_size,
                      size_t max_files);

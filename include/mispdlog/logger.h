@@ -2,7 +2,6 @@
 
 #include "mispdlog/common.h"
 #include "mispdlog/details/log_message.h"
-#include "mispdlog/details/threadpool.h"
 #include "mispdlog/level.h"
 #include "mispdlog/sinks/base_sink.h"
 #include <fmt/core.h>
@@ -166,6 +165,7 @@ protected:
    * @param message
    */
   virtual void sink_it_(const details::log_message &message);
+  virtual void flush_();
 
 protected:
   std::string name_;

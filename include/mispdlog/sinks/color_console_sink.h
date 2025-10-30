@@ -22,7 +22,8 @@ constexpr const char *magenta = "\033[35m";
 constexpr const char *cyan = "\033[36m";
 } // namespace color
 
-template <typename Mutex> class color_console_sink : public base_sink<Mutex> {
+template <typename Mutex>
+class color_console_sink final : public base_sink<Mutex> {
 public:
   color_console_sink() {
     colors_[static_cast<int>(level::trace)] = color::white;

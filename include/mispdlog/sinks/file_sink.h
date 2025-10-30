@@ -11,7 +11,7 @@
 
 namespace mispdlog {
 namespace sinks {
-template <typename Mutex> class file_sink : public base_sink<Mutex> {
+template <typename Mutex> class file_sink final : public base_sink<Mutex> {
 public:
   /**
    * @brief Construct a new file sink object

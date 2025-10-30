@@ -8,7 +8,7 @@
 namespace mispdlog {
 namespace sinks {
 
-template <typename Mutex> class console_sink : public base_sink<Mutex> {
+template <typename Mutex> class console_sink final : public base_sink<Mutex> {
 protected:
   void sink_it_(const details::log_message &msg) override {
     fmt::memory_buffer formatted;

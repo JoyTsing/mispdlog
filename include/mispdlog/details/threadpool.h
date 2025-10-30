@@ -1,9 +1,10 @@
 #pragma once
+
+#include "mispdlog/async_logger.h"
 #include "mispdlog/common.h"
 #include "mispdlog/details/async_message.h"
 #include "mispdlog/details/log_message.h"
 #include "mispdlog/details/mpmc_blocking_queue.h"
-#include "mispdlog/logger.h"
 
 #include <cstddef>
 #include <memory>
@@ -27,13 +28,13 @@ public:
   threadpool(const threadpool &) = delete;
   threadpool &operator=(const threadpool &) = delete;
 
-  void post_log(std::shared_ptr<logger> &&logger_ptr,
+  void post_log(std::shared_ptr<async_logger> &&logger_ptr,
                 const log_message &message);
 
-  void post_log_nowait(std::shared_ptr<logger> &&logger_ptr,
+  void post_log_nowait(std::shared_ptr<async_logger> &&logger_ptr,
                        const log_message &message);
 
-  void post_flush(std::shared_ptr<logger> &&logger_ptr);
+  void post_flush(std::shared_ptr<async_logger> &&logger_ptr);
 
   size_t overrun_counter();
 

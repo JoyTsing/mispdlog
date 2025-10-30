@@ -1,3 +1,4 @@
+#include <memory>
 #define ANKERL_NANOBENCH_IMPLEMENT
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
@@ -201,8 +202,8 @@ TEST_CASE("test_thread_pool_basic") {
       std::cout << "\n========== 测试6:线程池基础功能 ==========\n";
 
       // 创建线程池: 队列大小1024, 2个工作线程
-      details::threadpool pool(1024, 2);
-
+      auto pool = std::make_shared<details::threadpool>(1024, 2);
+      auto weak_prt = std::weak_ptr<details::threadpool>(pool);
       // 创建一个简单的 logger
       auto console_sink = std::make_shared<sinks::console_sink_mt>();
 
@@ -211,18 +212,21 @@ TEST_CASE("test_thread_pool_basic") {
       // 投递日志消息 - 为每次调用创建新的 shared_ptr
       details::log_message msg1("test", level::info,
                                 "Message 1 from thread pool");
-      auto test_logger1 = std::make_shared<logger>("test", console_sink);
-      pool.post_log(std::move(test_logger1), msg1);
+      auto test_logger1 =
+          std::make_shared<async_logger>("test", console_sink, weak_prt);
+      pool->post_log(std::move(test_logger1), msg1);
 
       details::log_message msg2("test", level::warn,
                                 "Message 2 from thread pool");
-      auto test_logger2 = std::make_shared<logger>("test", console_sink);
-      pool.post_log(std::move(test_logger2), msg2);
+      auto test_logger2 =
+          std::make_shared<async_logger>("test", console_sink, weak_prt);
+      pool->post_log(std::move(test_logger2), msg2);
 
       details::log_message msg3("test", level::error,
                                 "Message 3 from thread pool");
-      auto test_logger3 = std::make_shared<logger>("test", console_sink);
-      pool.post_log(std::move(test_logger3), msg3);
+      auto test_logger3 =
+          std::make_shared<async_logger>("test", console_sink, weak_prt);
+      pool->post_log(std::move(test_logger3), msg3);
 
       // 等待处理
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -234,8 +238,8 @@ TEST_CASE("test_thread_pool_basic") {
 TEST_CASE("test_thread_pool_performance") {
   CHECK_NOTHROW(
       std::cout << "\n========== 测试7:线程池性能 ==========\n";
-
-      details::threadpool pool(8192, 2);
+      auto pool = std::make_shared<details::threadpool>(8192, 2);
+      auto weak_prt = std::weak_ptr<details::threadpool>(pool);
 
       auto console_sink = std::make_shared<sinks::console_sink_mt>();
       console_sink->set_level(level::off); // 关闭输出,只测试队列性能
@@ -249,8 +253,9 @@ TEST_CASE("test_thread_pool_performance") {
       for (int i = 0; i < num_messages; ++i) {
         details::log_message msg("perf", level::info,
                                  "Performance test message");
-        auto test_logger = std::make_shared<logger>("perf", console_sink);
-        pool.post_log(std::move(test_logger), msg);
+        auto test_logger =
+            std::make_shared<async_logger>("perf", console_sink, weak_prt);
+        pool->post_log(std::move(test_logger), msg);
       }
 
       auto end = std::chrono::high_resolution_clock::now();
@@ -265,7 +270,7 @@ TEST_CASE("test_thread_pool_performance") {
       // 等待处理完成
       std::this_thread::sleep_for(std::chrono::seconds(2));
 
-      std::cout << "溢出次数: " << pool.overrun_counter() << "\n";);
+      std::cout << "溢出次数: " << pool->overrun_counter() << "\n";);
 }
 
 // NOLINTNEXTLINE
@@ -273,11 +278,13 @@ TEST_CASE("test_thread_pool_multithreaded") {
   CHECK_NOTHROW(
       std::cout << "\n========== 测试8:多线程使用线程池 ==========\n";
 
-      details::threadpool pool(4096, 3);
+      auto pool = std::make_shared<details::threadpool>(4096, 3);
+      auto weak_prt = std::weak_ptr<details::threadpool>(pool);
 
       auto console_sink = std::make_shared<sinks::console_sink_mt>();
       console_sink->set_level(level::off);
-      auto test_logger = std::make_shared<logger>("mt", console_sink);
+      auto test_logger =
+          std::make_shared<async_logger>("mt", console_sink, weak_prt);
 
       const int num_threads = 8; const int messages_per_thread = 100000;
 
@@ -290,7 +297,7 @@ TEST_CASE("test_thread_pool_multithreaded") {
         threads.emplace_back([&]() {
           for (int j = 0; j < messages_per_thread; ++j) {
             details::log_message msg("mt", level::info, "Test message");
-            pool.post_log(std::move(test_logger), msg);
+            pool->post_log(std::move(test_logger), msg);
             total_sent++;
           }
         });
@@ -321,23 +328,24 @@ TEST_CASE("test_overflow_policy") {
       std::cout << "\n========== 测试9:溢出策略 ==========\n";
 
       // 创建小队列测试溢出
-      details::threadpool pool(100, 1);
-
+      auto pool = std::make_shared<details::threadpool>(100, 1);
+      auto weak_prt = std::weak_ptr<details::threadpool>(pool);
       auto console_sink = std::make_shared<sinks::console_sink_mt>();
       console_sink->set_level(level::off);
-      auto test_logger = std::make_shared<logger>("overflow", console_sink);
+      auto test_logger =
+          std::make_shared<async_logger>("overflow", console_sink, weak_prt);
 
       std::cout << "快速投递大量消息到小队列(容量100)...\n";
 
       // 使用 nowait 模式快速填满队列
       for (int i = 0; i < 10000; ++i) {
         details::log_message msg("overflow", level::info, "Overflow test");
-        pool.post_log_nowait(std::move(test_logger), msg);
+        pool->post_log_nowait(std::move(test_logger), msg);
       }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-      size_t overruns = pool.overrun_counter();
+      size_t overruns = pool->overrun_counter();
       std::cout << "溢出次数: " << overruns << "\n";
 
       if (overruns > 0) { std::cout << " 溢出策略正常工作(覆盖旧消息)\n"; });
@@ -351,15 +359,16 @@ TEST_CASE("test_graceful_shutdown") {
       std::cout << "创建线程池并投递消息...\n";
 
       {
-        details::threadpool pool(1024, 2);
-
+        auto pool = std::make_shared<details::threadpool>(1024, 2);
+        auto weak_prt = std::weak_ptr<details::threadpool>(pool);
         auto console_sink = std::make_shared<sinks::console_sink_mt>();
         console_sink->set_level(level::off);
 
         for (int i = 0; i < 100; ++i) {
           details::log_message msg("shutdown", level::info, "Shutdown test");
-          auto test_logger = std::make_shared<logger>("shutdown", console_sink);
-          pool.post_log(std::move(test_logger), msg);
+          auto test_logger = std::make_shared<async_logger>(
+              "shutdown", console_sink, weak_prt);
+          pool->post_log(std::move(test_logger), msg);
         }
 
         std::cout << "线程池即将销毁...\n";

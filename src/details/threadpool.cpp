@@ -33,21 +33,21 @@ threadpool::~threadpool() {
   }
 }
 
-void threadpool::post_log(std::shared_ptr<logger> &&logger_ptr,
+void threadpool::post_log(std::shared_ptr<async_logger> &&logger_ptr,
                           const log_message &message) {
   async_message async_message(async_message_type::log, std::move(logger_ptr),
                               message);
   queue_.enqueue(std::move(async_message));
 }
 
-void threadpool::post_log_nowait(std::shared_ptr<logger> &&logger_ptr,
+void threadpool::post_log_nowait(std::shared_ptr<async_logger> &&logger_ptr,
                                  const log_message &message) {
   async_message async_message(async_message_type::log, std::move(logger_ptr),
                               message);
   queue_.enqueue_nowait(std::move(async_message));
 }
 
-void threadpool::post_flush(std::shared_ptr<logger> &&logger_ptr) {
+void threadpool::post_flush(std::shared_ptr<async_logger> &&logger_ptr) {
   async_message async_message(async_message_type::flush, std::move(logger_ptr));
   queue_.enqueue(std::move(async_message));
 }
@@ -67,13 +67,13 @@ bool threadpool::process_next_message_() {
   switch (message.type) {
   case async_message_type::log: {
     if (message.log_ptr) {
-      message.log_ptr->sink_it_(message);
+      message.log_ptr->backend_sink_it_(message);
     }
     return true;
   }
   case async_message_type::flush: {
     if (message.log_ptr) {
-      message.log_ptr->flush();
+      message.log_ptr->backend_flush_();
     }
     return true;
   }
