@@ -101,7 +101,7 @@ template <typename Mutex> void rotating_file_sink<Mutex>::rotate_() {
     }
     std::string rotate_name = calc_filename(filename_, i);
     if (rename_file_(source_name, rotate_name) == false) {
-      file_ = make_fileptr_(source_name, "wb");
+      file_ = make_fileptr_(filename(), "wb");
       if (file_ == nullptr) {
         throw std::runtime_error("rotating_file_sink: Failed to reopen file "
                                  "after failed rotation: " +
